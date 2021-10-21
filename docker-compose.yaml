@@ -30,7 +30,7 @@ services:
           - 9998:9998/tcp # thelounge
         #command: 
         volumes:
-          - /volume2/docker/vpn-gluetun-pia:/gluetun
+          - /volume1/docker/vpn-gluetun-pia:/gluetun
         environment:
           # More variables are available, see the Wiki table
           - OPENVPN_USER= 
@@ -55,7 +55,7 @@ services:
           - DISPLAY_WIDTH=1280
           - DISPLAY_HEIGHT=768
         volumes:
-          - /volume2/docker/firefox:/config
+          - /volume1/docker/firefox:/config
         network_mode: service:vpn
         #labels: 
         #  - autoheal=true
@@ -75,8 +75,8 @@ services:
           - TZ=America/New_York
           - WEBUI_PORT=8085
         volumes:
-          - /volume2/docker/qbittorrent:/config
-          - /volume2/docker/firefox/downloads:/monitored
+          - /volume1/docker/qbittorrent:/config
+          - /volume1/docker/firefox/downloads:/monitored
           - /volume1/Data/Downloads:/downloads 
         network_mode: service:vpn
         labels: 
@@ -96,7 +96,7 @@ services:
           - PGID=100
           - TZ=America/New_York
         volumes:
-          - /volume2/docker/delugevanilla:/config
+          - /volume1/docker/delugevanilla:/config
           - /volume1/Data/Downloads:/downloads 
         network_mode: service:vpn
         labels: 
@@ -116,7 +116,7 @@ services:
           - PGID=100
           - TZ=America/New_York
         volumes:
-          - /volume2/docker/sabnzbd:/config
+          - /volume1/docker/sabnzbd:/config
           - /volume2/SSDL:/data 
         network_mode: service:vpn
         labels: 
@@ -136,7 +136,7 @@ services:
           - PGID=100
           - TZ=America/New_York
         volumes:
-          - /volume2/docker/thelounge:/config
+          - /volume1/docker/thelounge:/config
         network_mode: service:vpn
         labels: 
           - autoheal=true
@@ -155,7 +155,7 @@ services:
           - PGID=100
           - TZ=America/New_York
         volumes:
-          - /volume2/docker/jackett:/config
+          - /volume1/docker/jackett:/config
         network_mode: service:vpn
         labels: 
           - autoheal=true
@@ -177,7 +177,7 @@ services:
         ports:
           - 7878:7878/tcp
         volumes:
-          - /volume2/docker/radarr:/config
+          - /volume1/docker/radarr:/config
           - /volume2/SSDL/complete:/complete
           - /volume1/Data/Downloads:/downloads
           - /volume1/Data/Movies:/movies
@@ -193,7 +193,7 @@ services:
         ports:
           - 8989:8989/tcp
         volumes:
-          - /volume2/docker/sonarr:/config
+          - /volume1/docker/sonarr:/config
           - /volume2/SSDL/complete:/complete
           - /volume1/Data/Downloads:/downloads
           - /volume1/Data/TV Shows:/tv
@@ -207,7 +207,7 @@ services:
         - PGID=100
         - TZ=America/New_York
       volumes:
-        - /volume2/docker/bazarr:/config
+        - /volume1/docker/bazarr:/config
         - /volume1/Data/Movies:/movies #optional
         - /volume1/Data/TV Shows:/tv #optional
       ports:
@@ -237,7 +237,7 @@ services:
         - PGID=100
         - TZ=America/New_York
       volumes:
-        - /volume2/docker/nzbhydra2:/config
+        - /volume1/docker/nzbhydra2:/config
         - /volume2/SSDL:/downloads
       ports:
         - 5076:5076
@@ -253,7 +253,7 @@ services:
         - VERSION=docker
         - PLEX_CLAIM= #optional
       volumes:
-        - /volume2/docker/plex:/config
+        - /volume1/docker/plex:/config
         - /volume1/Data/TV Shows:/tv
         - /volume1/Data/Movies:/movies
       restart: unless-stopped
