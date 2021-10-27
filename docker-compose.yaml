@@ -241,8 +241,8 @@ services:
         - PLEX_CLAIM=  #optional
       volumes:
         - /volume2/docker/plex:/config
-        - /volume1/Data/TV Shows:/tv
-        - /volume1/Data/Movies:/movies
+        - /volume1/Data/TV Shows:/media/tv
+        - /volume1/Data/Movies:/media/movies
       restart: unless-stopped
       
     lgogdownloader:
