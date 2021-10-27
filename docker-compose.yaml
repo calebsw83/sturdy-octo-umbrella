@@ -1,3 +1,5 @@
+#delete login info for vpn, plex, and gog
+
 version: "3.8"
 services:
     vpn:
@@ -30,11 +32,11 @@ services:
           - 9998:9998/tcp # thelounge
         #command: 
         volumes:
-          - /volume1/docker/vpn-gluetun-pia:/gluetun
+          - /volume2/docker/vpn-gluetun-pia:/gluetun
         environment:
           # More variables are available, see the Wiki table
-          - OPENVPN_USER= 
-          - OPENVPN_PASSWORD= 
+          - OPENVPN_USER=
+          - OPENVPN_PASSWORD=
           - VPNSP=pia
           - VPN_TYPE=openvpn
           - REGION=CA Montreal
@@ -55,7 +57,7 @@ services:
           - DISPLAY_WIDTH=1280
           - DISPLAY_HEIGHT=768
         volumes:
-          - /volume1/docker/firefox:/config
+          - /volume2/docker/firefox:/config
         network_mode: service:vpn
         #labels: 
         #  - autoheal=true
@@ -75,8 +77,8 @@ services:
           - TZ=America/New_York
           - WEBUI_PORT=8085
         volumes:
-          - /volume1/docker/qbittorrent:/config
-          - /volume1/docker/firefox/downloads:/monitored
+          - /volume2/docker/qbittorrent:/config
+          - /volume2/docker/firefox/downloads:/monitored
           - /volume1/Data/Downloads:/downloads 
         network_mode: service:vpn
         labels: 
@@ -96,7 +98,7 @@ services:
           - PGID=100
           - TZ=America/New_York
         volumes:
-          - /volume1/docker/delugevanilla:/config
+          - /volume2/docker/delugevanilla:/config
           - /volume1/Data/Downloads:/downloads 
         network_mode: service:vpn
         labels: 
@@ -116,7 +118,7 @@ services:
           - PGID=100
           - TZ=America/New_York
         volumes:
-          - /volume1/docker/sabnzbd:/config
+          - /volume2/docker/sabnzbd:/config
           - /volume2/SSDL:/data 
         network_mode: service:vpn
         labels: 
@@ -136,7 +138,7 @@ services:
           - PGID=100
           - TZ=America/New_York
         volumes:
-          - /volume1/docker/thelounge:/config
+          - /volume2/docker/thelounge:/config
         network_mode: service:vpn
         labels: 
           - autoheal=true
@@ -155,7 +157,7 @@ services:
           - PGID=100
           - TZ=America/New_York
         volumes:
-          - /volume1/docker/jackett:/config
+          - /volume2/docker/jackett:/config
         network_mode: service:vpn
         labels: 
           - autoheal=true
@@ -177,7 +179,7 @@ services:
         ports:
           - 7878:7878/tcp
         volumes:
-          - /volume1/docker/radarr:/config
+          - /volume2/docker/radarr:/config
           - /volume2/SSDL/complete:/complete
           - /volume1/Data/Downloads:/downloads
           - /volume1/Data/Movies:/movies
@@ -193,26 +195,11 @@ services:
         ports:
           - 8989:8989/tcp
         volumes:
-          - /volume1/docker/sonarr:/config
+          - /volume2/docker/sonarr:/config
           - /volume2/SSDL/complete:/complete
           - /volume1/Data/Downloads:/downloads
           - /volume1/Data/TV Shows:/tv
         restart: always
-
-    bazarr:
-      image: lscr.io/linuxserver/bazarr:latest
-      container_name: bazarr
-      environment:
-        - PUID=1029
-        - PGID=100
-        - TZ=America/New_York
-      volumes:
-        - /volume1/docker/bazarr:/config
-        - /volume1/Data/Movies:/movies #optional
-        - /volume1/Data/TV Shows:/tv #optional
-      ports:
-        - 6767:6767
-      restart: unless-stopped
 
     flaresolverr:
         image: flaresolverr/flaresolverr:latest
@@ -237,7 +224,7 @@ services:
         - PGID=100
         - TZ=America/New_York
       volumes:
-        - /volume1/docker/nzbhydra2:/config
+        - /volume2/docker/nzbhydra2:/config
         - /volume2/SSDL:/downloads
       ports:
         - 5076:5076
@@ -251,9 +238,36 @@ services:
         - PUID=1027
         - PGID=100
         - VERSION=docker
-        - PLEX_CLAIM= #optional
+        - PLEX_CLAIM=  #optional
       volumes:
-        - /volume1/docker/plex:/config
+        - /volume2/docker/plex:/config
         - /volume1/Data/TV Shows:/tv
         - /volume1/Data/Movies:/movies
       restart: unless-stopped
+      
+    lgogdownloader:
+        image: lukas1818/lgogdownloader:latest
+        container_name: lgogdownloader
+        environment:
+            - GOG_EMAIL=
+            - GOG_PASSWORD= 
+            - INTERVALL=1d
+        volumes:
+            - /volume1/Backup/Games:/home/user/downloads
+            - /volume2/docker/lgogdownloader:/home/user/.config/lgogdownloader
+        command: --help
+        restart: unless-stopped
+        
+    watchtower:
+      image: containrrr/watchtower:latest
+      container_name: watchtower
+      restart: always
+      volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
+        #- /etc/timezone:/etc/timezone:ro
+      environment:
+        - WATCHTOWER_CLEANUP=true
+        - WATCHTOWER_LABEL_ENABLE=true
+        - WATCHTOWER_INCLUDE_RESTARTING=true
+      labels:
+        - "com.centurylinklabs.watchtower.enable=true"
