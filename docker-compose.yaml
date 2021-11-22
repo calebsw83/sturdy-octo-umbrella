@@ -12,21 +12,21 @@ services:
     tty: true
     ports:
       - 5800:5800/tcp # Firefox
-      - 58846:58846/tcp # Deluge
-      - 58946:58946/udp # Deluge
-      - 58946:58946/tcp # Deluge
+      #- 58846:58846/tcp # Deluge
+      #- 58946:58946/udp # Deluge
+      #- 58946:58946/tcp # Deluge
       - 6800:6800/tcp # qbittorrent
       - 6800:6800/udp # qbittorrent
       - 8002:8002/tcp # Gluetun/?
       - 8080:8080/tcp # Sabnzbd
       - 8085:8085/tcp # qbittorrent
       - 8888:8888/tcp # HTTP proxy
-      - 8112:8112/tcp # deluge
+      #- 8112:8112/tcp # deluge
       - 8118:8118/tcp # 
       - 8191:8191/tcp # FlareSolverr
-      - 8389:8389/udp # Gluetun-Shadowsocks?
-      - 8389:8389/tcp # Gluetun-Shadowsocks?
-      - 8889:8889/tcp # Gluetun
+      - 8389:8389/udp # Shadowsocks
+      - 8389:8389/tcp # Shadowsocks
+      - 8889:8889/tcp # Gluetun/?
       - 9090:9090/tcp # Sabnzbd
       - 9117:9117/tcp # jackett       
       - 9998:9998/tcp # thelounge
