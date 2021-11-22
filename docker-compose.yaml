@@ -1,272 +1,304 @@
-#delete login info for vpn, plex, and gog
+#reminder to self: delete login info for vpn, plex, and gog
 
 version: "3.8"
 services:
-    vpn:
-        image: qmcgaw/gluetun:v3.25.0
-        container_name: vpn
-        cap_add:
-          - NET_ADMIN
-        network_mode: bridge
-        privileged: true
-        tty: true
-        ports:
-          - 5800:5800/tcp # Firefox
-          - 58846:58846/tcp # Deluge
-          - 58946:58946/udp # Deluge
-          - 58946:58946/tcp # Deluge
-          - 6800:6800/tcp # qbittorrent
-          - 6800:6800/udp # qbittorrent
-          - 8002:8002/tcp # Gluetun/?
-          - 8080:8080/tcp # Sabnzbd
-          - 8085:8085/tcp # qbittorrent
-          - 8888:8888/tcp # HTTP proxy
-          - 8112:8112/tcp # deluge
-          - 8118:8118/tcp # 
-          - 8191:8191/tcp # FlareSolverr
-          - 8389:8389/udp # Gluetun-Shadowsocks?
-          - 8389:8389/tcp # Gluetun-Shadowsocks?
-          - 8889:8889/tcp # Gluetun
-          - 9090:9090/tcp # Sabnzbd    
-          - 9117:9117/tcp # jackett           
-          - 9998:9998/tcp # thelounge
-        #command: 
-        volumes:
-          - /volume2/docker/vpn-gluetun-pia:/gluetun
-        environment:
-          # More variables are available, see the Wiki table
-          - OPENVPN_USER=
-          - OPENVPN_PASSWORD=
-          - VPNSP=pia
-          - VPN_TYPE=openvpn
-          - REGION=CA Montreal
-          - PORT_FORWARDING=on
-          - PORT_FORWARDING_STATUS_FILE=/tmp/gluetun/forwarded_port
-          # Timezone for accurate logs times
-          - TZ=America/New_York
-        restart: always
+  vpn:
+    image: qmcgaw/gluetun:v3.25.0
+    container_name: vpn
+    cap_add:
+      - NET_ADMIN
+    network_mode: bridge
+    privileged: true
+    tty: true
+    ports:
+      - 5800:5800/tcp # Firefox
+      - 58846:58846/tcp # Deluge
+      - 58946:58946/udp # Deluge
+      - 58946:58946/tcp # Deluge
+      - 6800:6800/tcp # qbittorrent
+      - 6800:6800/udp # qbittorrent
+      - 8002:8002/tcp # Gluetun/?
+      - 8080:8080/tcp # Sabnzbd
+      - 8085:8085/tcp # qbittorrent
+      - 8888:8888/tcp # HTTP proxy
+      - 8112:8112/tcp # deluge
+      - 8118:8118/tcp # 
+      - 8191:8191/tcp # FlareSolverr
+      - 8389:8389/udp # Gluetun-Shadowsocks?
+      - 8389:8389/tcp # Gluetun-Shadowsocks?
+      - 8889:8889/tcp # Gluetun
+      - 9090:9090/tcp # Sabnzbd
+      - 9117:9117/tcp # jackett       
+      - 9998:9998/tcp # thelounge
+    #command: 
+    volumes:
+      - /volume2/docker/vpn-gluetun-mullvad:/gluetun
+    environment:
+      # See https://github.com/qdm12/gluetun/wiki
+      - VPNSP=mullvad
+      - VPN_TYPE=wireguard
+      - WIREGUARD_PRIVATE_KEY=
+      - WIREGUARD_ADDRESS=10.xx.xxx.xx/32
+      - CITY=New York NY
+      - FIREWALL_VPN_INPUT_PORTS=xxxxx
+      # Timezone for accurate logs times
+      - TZ=America/New_York
+    restart: always
 
-    firefox:
-        image: jlesage/firefox:latest
-        container_name: vpn-firefox
-        environment:
-          - PUID=1028
-          - PGID=100
-          - TZ=America/New_York
-          - DISPLAY=:0
-          - DISPLAY_WIDTH=1280
-          - DISPLAY_HEIGHT=768
-        volumes:
-          - /volume2/docker/firefox:/config
-        network_mode: service:vpn
-        #labels: 
-        #  - autoheal=true
-        #healthcheck:
-        #  test: wget -nv -t1 --spider google.com || exit 1
-        #  interval: 30s
-        #  timeout: 10s
-        #  retries: 3
-        restart: always
-        
-    qbittorrent:
-        image: linuxserver/qbittorrent:latest
-        container_name: vpn-qbittorrent
-        environment:
-          - PUID=1028
-          - PGID=100
-          - TZ=America/New_York
-          - WEBUI_PORT=8085
-        volumes:
-          - /volume2/docker/qbittorrent:/config
-          - /volume2/docker/firefox/downloads:/monitored
-          - /volume1/Data/Downloads:/downloads 
-        network_mode: service:vpn
-        labels: 
-          - autoheal=true
-        healthcheck:
-          test: curl google.com || exit 1
-          interval: 30s
-          timeout: 10s
-          retries: 3
-        restart: always
-        
-    deluge:
-        image: linuxserver/deluge:latest
-        container_name: vpn-deluge
-        environment:
-          - PUID=1028
-          - PGID=100
-          - TZ=America/New_York
-        volumes:
-          - /volume2/docker/delugevanilla:/config
-          - /volume1/Data/Downloads:/downloads 
-        network_mode: service:vpn
-        labels: 
-          - autoheal=true
-        healthcheck:
-          test: curl google.com || exit 1
-          interval: 30s
-          timeout: 10s
-          retries: 3
-        restart: always
-        
-    sabnzbd:
-        image: linuxserver/sabnzbd:latest
-        container_name: vpn-sabnzbd
-        environment:
-          - PUID=1028
-          - PGID=100
-          - TZ=America/New_York
-        volumes:
-          - /volume2/docker/sabnzbd:/config
-          - /volume2/SSDL:/data 
-        network_mode: service:vpn
-        labels: 
-          - autoheal=true
-        healthcheck:
-          test: curl google.com || exit 1
-          interval: 30s
-          timeout: 10s
-          retries: 3
-        restart: always      
-        
-    thelounge:
-        image: linuxserver/thelounge:latest
-        container_name: vpn-thelounge
-        environment:
-          - PUID=1028
-          - PGID=100
-          - TZ=America/New_York
-        volumes:
-          - /volume2/docker/thelounge:/config
-        network_mode: service:vpn
-        labels: 
-          - autoheal=true
-        healthcheck:
-          test: curl google.com || exit 1
-          interval: 30s
-          timeout: 10s
-          retries: 3
-        restart: always
-        
-    jackett:
-        image: linuxserver/jackett:latest
-        container_name: vpn-jackett
-        environment:
-          - PUID=1028
-          - PGID=100
-          - TZ=America/New_York
-        volumes:
-          - /volume2/docker/jackett:/config
-        network_mode: service:vpn
-        labels: 
-          - autoheal=true
-          - com.centurylinklabs.watchtower.depends-on=vpn
-        healthcheck:
-          test: curl google.com || exit 1
-          interval: 30s
-          timeout: 10s
-          retries: 3
-        restart: always
+  firefox:
+    image: jlesage/firefox:latest
+    container_name: vpn-firefox
+    environment:
+      - PUID=1028
+      - PGID=100
+      - TZ=America/New_York
+      - DISPLAY=:0
+      - DISPLAY_WIDTH=1280
+      - DISPLAY_HEIGHT=768
+    volumes:
+      - /volume2/docker/firefox:/config
+    network_mode: service:vpn
+    #labels: 
+    #  - autoheal=true
+    #healthcheck:
+    #  test: wget -nv -t1 --spider google.com || exit 1
+    #  interval: 30s
+    #  timeout: 10s
+    #  retries: 3
+    restart: always 
+    
+  qbittorrent:
+    image: linuxserver/qbittorrent:latest
+    container_name: vpn-qbittorrent
+    environment:
+      - PUID=1028
+      - PGID=100
+      - TZ=America/New_York
+      - WEBUI_PORT=8085
+    volumes:
+      - /volume2/docker/qbittorrent:/config
+      - /volume2/docker/firefox/downloads:/monitored
+      - /volume1/Data/Downloads:/downloads 
+      - /volume1/Data/TV Shows/:/tv 
+    network_mode: service:vpn
+    labels: 
+      - autoheal=true
+    healthcheck:
+      test: curl google.com || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: always
+    
+#  deluge:
+#    image: linuxserver/deluge:latest
+#    container_name: vpn-deluge
+#    environment:
+#     - PUID=1028
+#      - PGID=100
+#     - TZ=America/New_York
+#    volumes:
+#      - /volume2/docker/delugevanilla:/config
+#      - /volume1/Data/Downloads:/downloads 
+#    network_mode: service:vpn
+#    labels: 
+#      - autoheal=true
+#    healthcheck:
+#      test: curl google.com || exit 1
+#      interval: 30s
+#      timeout: 10s
+#      retries: 3
+#    restart: always
+  
+  sabnzbd:
+    image: linuxserver/sabnzbd:latest
+    container_name: vpn-sabnzbd
+    environment:
+      - PUID=1028
+      - PGID=100
+      - TZ=America/New_York
+    volumes:
+      - /volume2/docker/sabnzbd:/config
+      - /volume2/SSDL:/data 
+    network_mode: service:vpn
+    labels: 
+      - autoheal=true
+    healthcheck:
+      test: curl google.com || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: always  
+    
+  thelounge:
+    image: linuxserver/thelounge:latest
+    container_name: vpn-thelounge
+    environment:
+      - PUID=1028
+      - PGID=100
+      - TZ=America/New_York
+    volumes:
+      - /volume2/docker/thelounge:/config
+    network_mode: service:vpn
+    labels: 
+      - autoheal=true
+    healthcheck:
+      test: curl google.com || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: always
+    
+  jackett:
+    image: linuxserver/jackett:latest
+    container_name: vpn-jackett
+    environment:
+      - PUID=1028
+      - PGID=100
+      - TZ=America/New_York
+    volumes:
+      - /volume2/docker/jackett:/config
+    network_mode: service:vpn
+    labels: 
+      - autoheal=true
+      - com.centurylinklabs.watchtower.depends-on=vpn
+    healthcheck:
+      test: curl google.com || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: always
 
-    radarr:
-        image: linuxserver/radarr:latest
-        container_name: radarr
-        environment:
-          - PUID=1029
-          - PGID=100
-          - TZ=America/New_York
-        ports:
-          - 7878:7878/tcp
-        volumes:
-          - /volume2/docker/radarr:/config
-          - /volume2/SSDL/complete:/complete
-          - /volume1/Data/Downloads:/downloads
-          - /volume1/Data/Movies:/movies
-        restart: always
+  radarr:
+    image: linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=1029
+      - PGID=100
+      - TZ=America/New_York
+    ports:
+      - 7878:7878/tcp
+    volumes:
+      - /volume2/docker/radarr:/config
+      - /volume2/SSDL/complete:/complete
+      - /volume1/Data/Downloads:/downloads
+      - /volume1/Data/Movies:/movies
+    restart: always
 
-    sonarr:
-        image: linuxserver/sonarr:latest
-        container_name: sonarr
-        environment:
-          - PUID=1029
-          - PGID=100
-          - TZ=America/New_York
-        ports:
-          - 8989:8989/tcp
-        volumes:
-          - /volume2/docker/sonarr:/config
-          - /volume2/SSDL/complete:/complete
-          - /volume1/Data/Downloads:/downloads
-          - /volume1/Data/TV Shows:/tv
-        restart: always
+  sonarr:
+    image: linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=1029
+      - PGID=100
+      - TZ=America/New_York
+    ports:
+      - 8989:8989/tcp
+    volumes:
+      - /volume2/docker/sonarr:/config
+      - /volume2/SSDL/complete:/complete
+      - /volume1/Data/Downloads:/downloads
+      - /volume1/Data/TV Shows:/tv
+    restart: always
 
-    flaresolverr:
-        image: flaresolverr/flaresolverr:latest
-        container_name: vpn-flaresolverr
-        environment:
-          - TZ=America/New_York
-        network_mode: service:vpn
-        #labels: 
-        #  - autoheal=true
-        #healthcheck:
-        #  test: wget -nv -t1 --spider google.com || exit 1
-        #  interval: 30s
-        #  timeout: 10s
-        #  retries: 3
-        restart: always
-        
-    nzbhydra2:
-      image: lscr.io/linuxserver/nzbhydra2:latest
-      container_name: nzbhydra2
-      environment:
-        - PUID=1029
-        - PGID=100
-        - TZ=America/New_York
-      volumes:
-        - /volume2/docker/nzbhydra2:/config
-        - /volume2/SSDL:/downloads
-      ports:
-        - 5076:5076
-      restart: unless-stopped
+  flaresolverr:
+    image: flaresolverr/flaresolverr:latest
+    container_name: vpn-flaresolverr
+    environment:
+      - TZ=America/New_York
+    network_mode: service:vpn
+    #labels: 
+    #  - autoheal=true
+    #healthcheck:
+    #  test: wget -nv -t1 --spider google.com || exit 1
+    #  interval: 30s
+    #  timeout: 10s
+    #  retries: 3
+    restart: always
+    
+  nzbhydra2:
+    image: lscr.io/linuxserver/nzbhydra2:latest
+    container_name: nzbhydra2
+    environment:
+      - PUID=1029
+      - PGID=100
+      - TZ=America/New_York
+    volumes:
+      - /volume2/docker/nzbhydra2:/config
+      - /volume2/SSDL:/downloads
+    ports:
+      - 5076:5076
+    restart: unless-stopped
+  
+  plex:
+    image: lscr.io/linuxserver/plex:latest
+    container_name: plex
+    network_mode: host
+    environment:
+      - PUID=1027
+      - PGID=100
+      - VERSION=docker
+      - PLEX_CLAIM= #optional
+    volumes:
+      - /volume2/docker/plex:/config
+      - /volume1/Data/:/media/
+    restart: unless-stopped
       
-    plex:
-      image: lscr.io/linuxserver/plex:latest
-      container_name: plex
-      network_mode: host
-      environment:
-        - PUID=1027
-        - PGID=100
-        - VERSION=docker
-        - PLEX_CLAIM=  #optional
-      volumes:
-        - /volume2/docker/plex:/config
-        - /volume1/Data/:/media
-      restart: unless-stopped
-      
-    lgogdownloader:
-        image: lukas1818/lgogdownloader:latest
-        container_name: lgogdownloader
-        environment:
-            - GOG_EMAIL=
-            - GOG_PASSWORD= 
-            - INTERVALL=1d
-        volumes:
-            - /volume1/Backup/Games:/home/user/downloads
-            - /volume2/docker/lgogdownloader:/home/user/.config/lgogdownloader
-        command: --help
-        restart: unless-stopped
-        
-    watchtower:
-      image: containrrr/watchtower:latest
-      container_name: watchtower
-      restart: always
-      volumes:
-        - /var/run/docker.sock:/var/run/docker.sock
-        #- /etc/timezone:/etc/timezone:ro
-      environment:
-        - WATCHTOWER_CLEANUP=true
-        - WATCHTOWER_LABEL_ENABLE=true
-        - WATCHTOWER_INCLUDE_RESTARTING=true
-      labels:
-        - "com.centurylinklabs.watchtower.enable=true"
+  lgogdownloader:
+    image: lukas1818/lgogdownloader:latest
+    container_name: lgogdownloader
+    environment:
+      - GOG_EMAIL=caleb.wilson@gmail.com
+      - GOG_PASSWORD=
+      - INTERVALL=1d #to delete files: lgogdownloader --check-orphans |xargs -r rm
+    volumes:
+      - /volume1/Backup/Games:/home/user/downloads
+      - /volume2/docker/lgogdownloader:/home/user/.config/lgogdownloader
+    command: --help 
+    restart: unless-stopped
+
+  syncthing:
+    image: lscr.io/linuxserver/syncthing:latest
+    container_name: syncthing
+    #hostname: syncthing #optional
+    environment:
+      - PUID=1026
+      - PGID=100
+      - TZ=America/New_York
+    volumes:
+      - /volume2/docker/sync:/config
+      - /volume1/Backup/Sync:/sync
+    ports:
+      - 8384:8384
+      - 22000:22000/tcp
+      - 22000:22000/udp
+      - 21027:21027/udp
+    restart: unless-stopped
+    
+  watchtower:
+    image: containrrr/watchtower:latest
+    container_name: watchtower
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      #- /etc/TZ:/etc/timezone:ro
+    environment:
+      - TZ=America/New_York
+      - WATCHTOWER_CLEANUP=true
+      #- WATCHTOWER_LABEL_ENABLE=true
+      - WATCHTOWER_INCLUDE_RESTARTING=true
+      - WATCHTOWER_SCHEDULE=0 0 4 * * *
+    #labels:
+    #  - "com.centurylinklabs.watchtower.enable=true"
+
+#  jellyfin:    
+#    image: jellyfin/jellyfin
+#    container_name: jellyfin
+#    user: 1027:100
+#    network_mode: "host"
+#    volumes:
+#      - /volume2/docker/jellyfin:/config
+#      - /volume2/docker/jellyfin/cache:/cache
+#      - /volume1/Data/:/media
+#      - /volume1/Media:/dvd
+#    restart: "unless-stopped"
